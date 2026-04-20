@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Home on the Range">
+<title>Home on the Range</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-user-select:none;user-select:none;
+  background-color:#4a7c2e;
+  background-image:
+    radial-gradient(ellipse 3px 1px at 10% 20%,rgba(255,255,255,0.08) 50%,transparent 60%),
+    radial-gradient(ellipse 2px 1px at 30% 60%,rgba(0,0,0,0.15) 50%,transparent 60%),
+    radial-gradient(ellipse 3px 1px at 70% 30%,rgba(255,255,255,0.1) 50%,transparent 60%),
+    radial-gradient(ellipse 2px 1px at 85% 75%,rgba(0,0,0,0.12) 50%,transparent 60%),
+    radial-gradient(ellipse 2px 1px at 50% 50%,rgba(255,255,255,0.07) 50%,transparent 60%),
+    radial-gradient(ellipse 3px 1px at 20% 85%,rgba(0,0,0,0.1) 50%,transparent 60%),
+    radial-gradient(ellipse 2px 1px at 90% 15%,rgba(255,255,255,0.08) 50%,transparent 60%),
+    radial-gradient(ellipse 2px 1px at 40% 10%,rgba(0,0,0,0.15) 50%,transparent 60%),
+    linear-gradient(135deg,#3d6824 0%,#4a7c2e 25%,#5a8e38 50%,#4a7c2e 75%,#3d6824 100%);
+  background-size:40px 40px,35px 35px,30px 30px,45px 45px,25px 25px,50px 50px,38px 38px,42px 42px,100% 100%;
+  background-attachment:fixed;
+}
+.app{max-width:420px;margin:0 auto;padding:10px;min-height:100vh}
+.app-title{text-align:center;padding:10px 0 14px;margin-bottom:6px;background:rgba(255,255,255,0.9);border:2px solid #1a1a1a;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.25)}
+.app-title .main{font-size:30px;font-weight:800;color:#1a5c2a;letter-spacing:-0.5px;line-height:1.1}
+.app-title .main .mid{color:#1a1a1a;font-weight:400;font-style:italic;font-size:22px}
+.app-title .sub{font-size:11px;color:#1a1a1a;margin-top:4px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.card{background:#fff;border:2px solid #1a1a1a;border-radius:6px;padding:12px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2)}
+.screen{display:none}.screen.active{display:block}
+select{width:100%;padding:8px 10px;border:2px solid #1a1a1a;border-radius:4px;font-size:14px;color:#1a1a1a;background:#fff;margin-top:6px;-webkit-appearance:none;appearance:none}
+label{font-size:12px;color:#1a1a1a;font-weight:600;display:block;margin-top:10px}
+.btn{display:block;width:100%;padding:14px;border:2px solid #1a1a1a;border-radius:4px;font-size:14px;font-weight:600;background:#fff;color:#1a1a1a;margin-top:10px;-webkit-appearance:none;appearance:none;font-family:inherit;text-align:center;cursor:pointer}
+.btn:active{background:#f0f0f0}
+.btn-primary{background:#1a5c2a;color:#fff;border-color:#1a1a1a}
+.btn-primary:active{background:#14481f}
+.btn-sm{width:auto;padding:8px 14px;font-size:12px;margin-top:0;display:inline-block}
+.btn-red{color:#aa1111;border-color:#aa1111;background:#fff}
+.hole-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px}
+.hole-info{text-align:center;flex:1}
+.hole-info .num{font-size:18px;font-weight:700;color:#1a1a1a}
+.hole-info .sub{font-size:11px;color:#333}
+.hole-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid #1a1a1a;font-size:9px;display:flex;align-items:center;justify-content:center;color:#1a1a1a;background:#d4e8c2;font-weight:600;cursor:pointer}
+.dot.active{background:#1a5c2a;color:#fff;border-color:#1a1a1a}
+.dot.done{background:#8ac890;color:#1a1a1a;border-color:#1a1a1a}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.stat{background:#d4e8c2;border:2px solid #1a1a1a;border-radius:4px;padding:7px;text-align:center}
+.stat .val{font-size:17px;font-weight:700;color:#1a1a1a}
+.stat .lbl{font-size:10px;color:#1a1a1a;margin-top:1px;font-weight:600}
+.zone-bar{text-align:center;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px;border:2px solid #1a1a1a;margin-bottom:8px;background:#d4e8c2;color:#1a1a1a}
+.zone-bar.close{background:#fff3cd;color:#7a4a00;border-color:#c47000}
+.canvas-wrap{width:100%;-webkit-user-select:none;position:relative}
+canvas{width:100%;display:block;border-radius:4px;border:2px solid #1a1a1a}
+.club-suggest{border:2px solid #1a1a1a;border-radius:4px;padding:10px;margin:8px 0;text-align:center;background:#fff}
+.club-name{font-size:34px;font-weight:700;color:#1a5c2a}
+.club-sub{font-size:11px;color:#1a1a1a;margin-top:2px}
+.club-alts{display:flex;gap:5px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.alt-pill{padding:3px 8px;border-radius:20px;font-size:11px;background:#fff;border:2px solid #1a1a1a;color:#1a1a1a;font-weight:600}
+.shots-list{margin-top:6px;max-height:100px;overflow-y:auto}
+.shot-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #aac890;font-size:12px;color:#1a1a1a}
+.tab-bar{display:flex;border-bottom:2px solid #1a1a1a;margin-bottom:10px;background:rgba(255,255,255,0.85);border-radius:4px 4px 0 0;padding:0 4px}
+.tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:700;color:#666;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer}
+.tab.active{color:#1a1a1a;border-bottom:3px solid #1a1a1a}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.sc-wrap{overflow-x:auto}
+.sc-table{width:100%;border-collapse:collapse;font-size:12px;min-width:320px}
+.sc-table th{font-weight:700;color:#1a1a1a;padding:5px 4px;text-align:center;border-bottom:2px solid #1a1a1a;background:#c0dca8}
+.sc-table td{padding:4px;text-align:center;border-bottom:1px solid #aac890;color:#1a1a1a}
+.sc-table tr.cur td{background:#b8d8a0}
+.eagle{background:#4ac84a !important;color:#fff !important;font-weight:700}
+.birdie{background:#4a90e0 !important;color:#fff !important;font-weight:700}
+.par-c{background:#c0dca8 !important;color:#1a1a1a !important}
+.bogey{background:#f0c840 !important;color:#1a1a1a !important}
+.dbl{background:#e04040 !important;color:#fff !important;font-weight:700}
+.rel{font-size:20px;font-weight:700}
+.rel.under{color:#1a5c2a}.rel.over{color:#aa1111}.rel.even{color:#1a1a1a}
+.tap-hint{font-size:11px;color:#1a1a1a;text-align:center;font-weight:600;background:#fff;border-radius:4px;border:1.5px solid #1a1a1a;margin-top:6px;padding:5px 8px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0;margin-top:6px}
+.li{display:flex;align-items:center;gap:3px;font-size:10px;color:#1a1a1a;font-weight:600}
+.ls{width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #1a1a1a}
+.score-adj{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #1a1a1a;border-radius:4px;padding:5px 8px;margin-top:8px}
+.score-adj span{font-size:12px;font-weight:700;color:#1a1a1a;flex:1}
+.adj-btn{width:36px;height:36px;border:2px solid #1a1a1a;border-radius:4px;background:#fff;font-size:20px;font-weight:700;color:#1a1a1a;flex-shrink:0;-webkit-appearance:none;appearance:none;font-family:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.adj-val{font-size:20px;font-weight:700;color:#1a5c2a;min-width:32px;text-align:center}
+.btm-actions{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.course-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.course-card{border:2px solid #1a1a1a;border-radius:6px;padding:12px 8px;text-align:center;background:#fff;cursor:pointer}
+.course-card.sel{background:#1a5c2a;color:#fff}
+.course-card .cn{font-size:14px;font-weight:700}
+.course-card .cs{font-size:10px;margin-top:3px;font-weight:600}
+.course-card.sel .cs{color:#d4e8c2}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<div class="app-title">
+<div class="main">Home <span class="mid">on the</span> Range</div>
+<div class="sub">⛳ Range practice · Course play</div>
+</div>
+
+<div id="s-start" class="screen active">
+<div class="card">
+<div style="text-align:center;padding:4px 0 8px">
+<div style="font-size:18px;font-weight:700;color:#1a1a1a">Choose a course</div>
+</div>
+<div class="course-pick">
+<div class="course-card sel" id="crs-holmes"><div class="cn">Holmes</div><div class="cs">Lincoln, NE · Par 72</div></div>
+<div class="course-card" id="crs-crooked"><div class="cn">Crooked Creek</div><div class="cs">Lincoln, NE · Par 72</div></div>
+</div>
+</div>
+<div class="card">
+<div style="text-align:center;padding:4px 0 6px">
+<div id="crs-name" style="font-size:22px;font-weight:700;color:#1a1a1a">Holmes Golf</div>
+<div id="crs-info" style="font-size:12px;color:#1a1a1a;margin-top:3px;font-weight:600">Lincoln, NE · Par 72 · 6,805 yds</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+<div class="stat"><div class="val">18</div><div class="lbl">holes</div></div>
+<div class="stat"><div class="val" id="crs-par">72</div><div class="lbl">par</div></div>
+<div class="stat"><div class="val" id="crs-yds">6,805</div><div class="lbl">yards</div></div>
+</div>
+</div>
+<div class="card">
+<label>Tee selection</label>
+<select id="tee-sel">
+<option value="blue">Blue tees</option>
+<option value="white">White tees</option>
+<option value="red">Red tees</option>
+</select>
+<label>Players</label>
+<select><option>1 player</option><option>2 players</option><option>3 players</option><option>4 players</option></select>
+<a href="#" class="btn btn-primary" id="btn-start" style="margin-top:14px;text-decoration:none">Start round ↗</a>
+</div>
+</div>
+
+<div id="s-hole" class="screen">
+<div class="card" style="padding:10px">
+<div class="hole-header">
+<a href="#" class="btn btn-sm" id="btn-prev" style="text-decoration:none">← prev</a>
+<div class="hole-info"><div class="num" id="h-num">Hole 1</div><div class="sub" id="h-desc"></div></div>
+<a href="#" class="btn btn-sm" id="btn-next" style="text-decoration:none">next →</a>
+</div>
+<div class="hole-dots" id="hole-dots"></div>
+<div class="stat-grid">
+<div class="stat"><div class="val" id="h-par">4</div><div class="lbl">par</div></div>
+<div class="stat"><div class="val" id="h-yds">395</div><div class="lbl">yards</div></div>
+<div class="stat"><div class="val" id="h-strokes">0</div><div class="lbl">strokes</div></div>
+</div>
+<div class="zone-bar" id="zone-bar">Touch ball or fairway to move · touch rough to scroll</div>
+</div>
+
+<div class="tab-bar">
+<div class="tab active" id="tab-hole">Hole view</div>
+<div class="tab" id="tab-score">Scorecard</div>
+</div>
+
+<div id="panel-hole" class="tab-panel active">
+<div class="card" style="padding:8px">
+<div class="canvas-wrap" id="canvas-wrap"><canvas id="hole-canvas"></canvas></div>
+<div class="tap-hint" id="tap-hint">Touch ball on fairway to move · touch rough to scroll</div>
+<div class="legend">
+<div class="li"><span class="ls" style="background:#6aaa38"></span>Fairway (drag here)</div>
+<div class="li"><span class="ls" style="background:#f5e090"></span>Short game (&lt;25y)</div>
+<div class="li"><span class="ls" style="background:#4a8cbf"></span>Water</div>
+<div class="li"><span class="ls" style="background:#e8d070"></span>Bunker</div>
+</div>
+</div>
+<div class="card">
+<div id="club-empty" style="text-align:center;padding:10px 0;font-size:12px;color:#444;font-weight:600">Drag the ball to get a club suggestion</div>
+<div id="club-box-wrap" style="display:none">
+<div class="club-suggest">
+<div style="font-size:10px;color:#1a1a1a;margin-bottom:2px;font-weight:700">Suggested club</div>
+<div class="club-name" id="suggest-club">7i</div>
+<div class="club-sub" id="suggest-range">carries ~150 yds</div>
+<div class="club-alts" id="suggest-alts"></div>
+</div>
+</div>
+<div class="score-adj">
+<span>Adjust strokes:</span>
+<a href="#" class="adj-btn" id="btn-minus" style="text-decoration:none">−</a>
+<div class="adj-val" id="adj-val">0</div>
+<a href="#" class="adj-btn" id="btn-plus" style="text-decoration:none">+</a>
+</div>
+<div class="btm-actions">
+<span style="font-size:12px;color:#1a1a1a;font-weight:700">Shots: <b id="shot-ct" style="color:#1a5c2a">0</b> +2 putts</span>
+<a href="#" class="btn btn-sm btn-red" id="btn-undo" style="margin-left:auto;text-decoration:none">Undo</a>
+<a href="#" class="btn btn-primary btn-sm" id="btn-finish" style="text-decoration:none">Finish ✓</a>
+</div>
+<div class="shots-list" id="shots-list"></div>
+</div>
+</div>
+
+<div id="panel-score" class="tab-panel">
+<div class="card" style="padding:10px">
+<div class="sc-wrap">
+<table class="sc-table">
+<thead><tr><th>#</th><th>Par</th><th>Hdcp</th><th>Yds</th><th>Score</th><th>+/-</th></tr></thead>
+<tbody id="sc-body"></tbody>
+<tfoot><tr style="background:#b8d8a0"><td colspan="3" style="text-align:left;font-size:11px;padding:6px 4px;font-weight:700">Total</td><td id="sc-total-yds" style="font-size:11px;font-weight:600">6,805</td><td id="sc-total-score" style="font-weight:700"></td><td id="sc-total-rel" style="font-weight:700"></td></tr></tfoot>
+</table>
+</div>
+</div>
+</div>
+<a href="#" class="btn" id="btn-back" style="background:#fff;font-size:13px;text-decoration:none">← Change course</a>
+</div>
+
+</div>
+
+<script>
+// ======== HOLMES GOLF COURSE — Lincoln, NE ========
+var HOLES_HOLMES = [
+{par:4,yds:395,hcp:5,desc:"Gentle dogleg right",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.64,y:0.72},{x:0.70,y:0.55},{x:0.75,y:0.35},{x:0.72,y:0.08},{x:0.58,y:0.0},{x:0.44,y:0.0},{x:0.42,y:0.28},{x:0.38,y:0.48},{x:0.34,y:0.68}],water:null,bunkers:[{x:0.42,y:0.07,rot:0.3},{x:0.64,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:420,hcp:1,desc:"Hardest hole",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.70,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:5,yds:530,hcp:3,desc:"Long par 5",fw:[{x:0.36,y:1.0},{x:0.60,y:1.0},{x:0.62,y:0.65},{x:0.68,y:0.50},{x:0.76,y:0.38},{x:0.78,y:0.18},{x:0.72,y:0.0},{x:0.54,y:0.0},{x:0.52,y:0.2},{x:0.46,y:0.38},{x:0.42,y:0.52},{x:0.36,y:0.65}],water:null,bunkers:[{x:0.44,y:0.05,rot:0.2},{x:0.66,y:0.06,rot:-0.2}],treeL:true,treeR:true},
+{par:4,yds:370,hcp:11,desc:"Pond right",fw:[{x:0.35,y:1.0},{x:0.62,y:1.0},{x:0.60,y:0.0},{x:0.34,y:0.0}],water:{x:0.78,y:0.50,rx:0.10,ry:0.07},bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.64,y:0.07,rot:-0.3}],treeL:true,treeR:false},
+{par:3,yds:195,hcp:7,desc:"Long par 3",fw:[{x:0.28,y:1.0},{x:0.72,y:1.0},{x:0.70,y:0.0},{x:0.30,y:0.0}],water:null,bunkers:[{x:0.24,y:0.07,rot:0.4},{x:0.76,y:0.07,rot:-0.4}],treeL:true,treeR:true},
+{par:4,yds:380,hcp:9,desc:"Dogleg left",fw:[{x:0.38,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.58},{x:0.56,y:0.44},{x:0.46,y:0.30},{x:0.30,y:0.18},{x:0.24,y:0.0},{x:0.42,y:0.0},{x:0.48,y:0.16},{x:0.56,y:0.28},{x:0.64,y:0.44},{x:0.68,y:0.58}],water:null,bunkers:[{x:0.28,y:0.07,rot:0.2},{x:0.46,y:0.07,rot:-0.3}],treeL:false,treeR:true},
+{par:4,yds:360,hcp:13,desc:"Creek crosses fairway",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:{x:0.5,y:0.52,rx:0.22,ry:0.03,creek:true},bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:false},
+{par:5,yds:520,hcp:15,desc:"Open par 5",fw:[{x:0.32,y:1.0},{x:0.68,y:1.0},{x:0.66,y:0.0},{x:0.34,y:0.0}],water:null,bunkers:[{x:0.28,y:0.07,rot:0.3},{x:0.72,y:0.07,rot:-0.3},{x:0.70,y:0.45,rot:0.4}],treeL:false,treeR:true},
+{par:4,yds:415,hcp:17,desc:"Dogleg right",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.64,y:0.55},{x:0.70,y:0.40},{x:0.74,y:0.20},{x:0.70,y:0.0},{x:0.52,y:0.0},{x:0.48,y:0.18},{x:0.44,y:0.38},{x:0.40,y:0.55}],water:{x:0.80,y:0.38,rx:0.09,ry:0.06},bunkers:[{x:0.40,y:0.05,rot:0.2},{x:0.62,y:0.05,rot:-0.2}],treeL:true,treeR:false},
+{par:4,yds:360,hcp:2,desc:"Tight corridor",fw:[{x:0.37,y:1.0},{x:0.63,y:1.0},{x:0.61,y:0.0},{x:0.39,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:380,hcp:6,desc:"Dogleg left, pond",fw:[{x:0.38,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.56},{x:0.54,y:0.42},{x:0.44,y:0.28},{x:0.28,y:0.16},{x:0.22,y:0.0},{x:0.40,y:0.0},{x:0.46,y:0.14},{x:0.56,y:0.28},{x:0.64,y:0.42},{x:0.68,y:0.56}],water:{x:0.18,y:0.44,rx:0.09,ry:0.06},bunkers:[{x:0.26,y:0.05,rot:0.2},{x:0.46,y:0.05,rot:-0.2}],treeL:false,treeR:true},
+{par:3,yds:165,hcp:16,desc:"Over water",fw:[{x:0.30,y:1.0},{x:0.70,y:1.0},{x:0.68,y:0.0},{x:0.32,y:0.0}],water:{x:0.50,y:0.60,rx:0.18,ry:0.08},bunkers:[{x:0.26,y:0.07,rot:0.4},{x:0.74,y:0.07,rot:-0.4}],treeL:true,treeR:true},
+{par:4,yds:350,hcp:10,desc:"Short par 4",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:false},
+{par:4,yds:400,hcp:4,desc:"Dogleg right",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.64,y:0.60},{x:0.70,y:0.44},{x:0.74,y:0.26},{x:0.70,y:0.0},{x:0.52,y:0.0},{x:0.48,y:0.24},{x:0.42,y:0.42},{x:0.38,y:0.60}],water:{x:0.82,y:0.44,rx:0.09,ry:0.06},bunkers:[{x:0.40,y:0.05,rot:0.2},{x:0.62,y:0.05,rot:-0.2}],treeL:true,treeR:false},
+{par:5,yds:520,hcp:12,desc:"Holmes Lake",fw:[{x:0.36,y:1.0},{x:0.60,y:1.0},{x:0.62,y:0.62},{x:0.68,y:0.48},{x:0.74,y:0.34},{x:0.76,y:0.16},{x:0.70,y:0.0},{x:0.52,y:0.0},{x:0.50,y:0.16},{x:0.44,y:0.32},{x:0.40,y:0.48},{x:0.36,y:0.62}],water:{x:0.86,y:0.40,rx:0.11,ry:0.22},bunkers:[{x:0.42,y:0.05,rot:0.2},{x:0.62,y:0.05,rot:-0.2}],treeL:true,treeR:false},
+{par:4,yds:340,hcp:14,desc:"Short par 4",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:390,hcp:8,desc:"Dogleg left",fw:[{x:0.38,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.58},{x:0.54,y:0.44},{x:0.42,y:0.30},{x:0.28,y:0.18},{x:0.22,y:0.0},{x:0.40,y:0.0},{x:0.46,y:0.16},{x:0.56,y:0.30},{x:0.64,y:0.44},{x:0.68,y:0.58}],water:{x:0.18,y:0.46,rx:0.09,ry:0.06},bunkers:[{x:0.26,y:0.05,rot:0.2},{x:0.46,y:0.05,rot:-0.2}],treeL:false,treeR:true},
+{par:4,yds:380,hcp:18,desc:"Finishing hole",fw:[{x:0.34,y:1.0},{x:0.66,y:1.0},{x:0.64,y:0.0},{x:0.36,y:0.0}],water:{x:0.50,y:0.18,rx:0.16,ry:0.07},bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.70,y:0.07,rot:-0.3}],treeL:true,treeR:true}
+];
+
+// ======== CROOKED CREEK GOLF CLUB — Lincoln, NE ========
+// Par 72, 6,697 yards. Designed by Pat West, opened 1995.
+// Features an angling creek winding through 180 acres on a valley slope.
+// Hole 13 is the signature long par 5 where 2nd shot carries the creek to a domed green.
+var HOLES_CROOKED = [
+{par:4,yds:385,hcp:9,desc:"Opener down into valley",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:410,hcp:3,desc:"Dogleg right, creek right",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.64,y:0.60},{x:0.70,y:0.42},{x:0.74,y:0.22},{x:0.70,y:0.0},{x:0.52,y:0.0},{x:0.48,y:0.22},{x:0.44,y:0.42},{x:0.38,y:0.60}],water:{x:0.82,y:0.50,rx:0.03,ry:0.30,creek:true},bunkers:[{x:0.40,y:0.05,rot:0.2},{x:0.62,y:0.05,rot:-0.2}],treeL:true,treeR:false},
+{par:3,yds:170,hcp:15,desc:"Short par 3",fw:[{x:0.30,y:1.0},{x:0.70,y:1.0},{x:0.68,y:0.0},{x:0.32,y:0.0}],water:null,bunkers:[{x:0.26,y:0.07,rot:0.4},{x:0.74,y:0.07,rot:-0.4}],treeL:true,treeR:true},
+{par:5,yds:510,hcp:7,desc:"Creek guards the green",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:{x:0.50,y:0.18,rx:0.20,ry:0.025,creek:true},bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:395,hcp:5,desc:"Uphill tee shot",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.70,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:360,hcp:13,desc:"Dogleg left",fw:[{x:0.38,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.58},{x:0.54,y:0.42},{x:0.44,y:0.28},{x:0.28,y:0.16},{x:0.22,y:0.0},{x:0.40,y:0.0},{x:0.46,y:0.14},{x:0.56,y:0.28},{x:0.64,y:0.42},{x:0.68,y:0.58}],water:null,bunkers:[{x:0.26,y:0.05,rot:0.2},{x:0.46,y:0.05,rot:-0.2}],treeL:false,treeR:true},
+{par:3,yds:200,hcp:11,desc:"Long par 3, bunkers guard green",fw:[{x:0.28,y:1.0},{x:0.72,y:1.0},{x:0.70,y:0.0},{x:0.30,y:0.0}],water:null,bunkers:[{x:0.24,y:0.07,rot:0.4},{x:0.76,y:0.07,rot:-0.4},{x:0.50,y:0.18,rot:0}],treeL:true,treeR:true},
+{par:5,yds:535,hcp:1,desc:"Hardest hole, long par 5",fw:[{x:0.36,y:1.0},{x:0.60,y:1.0},{x:0.62,y:0.65},{x:0.68,y:0.50},{x:0.76,y:0.38},{x:0.78,y:0.18},{x:0.72,y:0.0},{x:0.54,y:0.0},{x:0.52,y:0.2},{x:0.46,y:0.38},{x:0.42,y:0.52},{x:0.36,y:0.65}],water:null,bunkers:[{x:0.44,y:0.05,rot:0.2},{x:0.66,y:0.06,rot:-0.2},{x:0.72,y:0.40,rot:0.4}],treeL:true,treeR:true},
+{par:4,yds:375,hcp:17,desc:"Reachable for long hitters",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:false},
+{par:4,yds:400,hcp:6,desc:"Back nine starts uphill",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.70,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:4,yds:420,hcp:2,desc:"Long par 4, creek left",fw:[{x:0.38,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.58},{x:0.54,y:0.44},{x:0.42,y:0.30},{x:0.28,y:0.16},{x:0.22,y:0.0},{x:0.40,y:0.0},{x:0.46,y:0.14},{x:0.56,y:0.28},{x:0.64,y:0.42},{x:0.68,y:0.56}],water:{x:0.18,y:0.50,rx:0.03,ry:0.30,creek:true},bunkers:[{x:0.26,y:0.05,rot:0.2},{x:0.46,y:0.05,rot:-0.2}],treeL:false,treeR:true},
+{par:3,yds:165,hcp:16,desc:"Short par 3 over creek",fw:[{x:0.30,y:1.0},{x:0.70,y:1.0},{x:0.68,y:0.0},{x:0.32,y:0.0}],water:{x:0.50,y:0.75,rx:0.22,ry:0.04,creek:true},bunkers:[{x:0.26,y:0.07,rot:0.4},{x:0.74,y:0.07,rot:-0.4}],treeL:true,treeR:true},
+{par:5,yds:555,hcp:3,desc:"Signature hole — carry creek to domed green",fw:[{x:0.36,y:1.0},{x:0.60,y:1.0},{x:0.62,y:0.65},{x:0.68,y:0.50},{x:0.76,y:0.38},{x:0.78,y:0.18},{x:0.72,y:0.0},{x:0.54,y:0.0},{x:0.52,y:0.2},{x:0.46,y:0.38},{x:0.42,y:0.52},{x:0.36,y:0.65}],water:{x:0.50,y:0.22,rx:0.25,ry:0.025,creek:true},bunkers:[{x:0.44,y:0.05,rot:0.2},{x:0.66,y:0.05,rot:-0.2}],treeL:true,treeR:true},
+{par:4,yds:390,hcp:8,desc:"Dogleg right",fw:[{x:0.38,y:1.0},{x:0.62,y:1.0},{x:0.64,y:0.60},{x:0.70,y:0.44},{x:0.74,y:0.26},{x:0.70,y:0.0},{x:0.52,y:0.0},{x:0.48,y:0.24},{x:0.42,y:0.42},{x:0.38,y:0.60}],water:null,bunkers:[{x:0.40,y:0.05,rot:0.2},{x:0.62,y:0.05,rot:-0.2}],treeL:true,treeR:true},
+{par:4,yds:350,hcp:14,desc:"Short par 4, position off tee",fw:[{x:0.37,y:1.0},{x:0.63,y:1.0},{x:0.61,y:0.0},{x:0.39,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:3,yds:180,hcp:12,desc:"Uphill par 3",fw:[{x:0.30,y:1.0},{x:0.70,y:1.0},{x:0.68,y:0.0},{x:0.32,y:0.0}],water:null,bunkers:[{x:0.26,y:0.07,rot:0.4},{x:0.74,y:0.07,rot:-0.4}],treeL:true,treeR:true},
+{par:4,yds:405,hcp:4,desc:"Back uphill toward clubhouse",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.30,y:0.07,rot:0.3},{x:0.70,y:0.07,rot:-0.3}],treeL:true,treeR:true},
+{par:5,yds:492,hcp:10,desc:"Finishing par 5, uphill to clubhouse",fw:[{x:0.36,y:1.0},{x:0.64,y:1.0},{x:0.62,y:0.0},{x:0.38,y:0.0}],water:null,bunkers:[{x:0.32,y:0.07,rot:0.3},{x:0.68,y:0.07,rot:-0.3},{x:0.50,y:0.40,rot:0}],treeL:true,treeR:true}
+];
+
+var COURSES = {
+  holmes: {name:"Holmes Golf", info:"Lincoln, NE · Par 72 · 6,805 yds", par:72, yds:6805, holes:HOLES_HOLMES},
+  crooked: {name:"Crooked Creek", info:"Lincoln, NE · Par 72 · 6,697 yds", par:72, yds:6697, holes:HOLES_CROOKED}
+};
+
+var HOLES = HOLES_HOLMES;
+var currentCourseKey = "holmes";
+
+var CLUBS = [
+{name:"Dr",avg:230,range:[200,260]},{name:"3W",avg:210,range:[190,235]},{name:"5W",avg:195,range:[175,215]},{name:"4i",avg:180,range:[165,195]},
+{name:"5i",avg:170,range:[155,185]},{name:"6i",avg:160,range:[145,175]},{name:"7i",avg:150,range:[135,165]},{name:"8i",avg:140,range:[125,155]},
+{name:"9i",avg:130,range:[115,145]},{name:"PW",avg:115,range:[100,130]},{name:"GW",avg:100,range:[85,115]},{name:"SW",avg:80,range:[60,95]},
+{name:"LW",avg:60,range:[40,75]},{name:"Ptr",avg:15,range:[0,30]}
+];
+
+var PUTT_ADD=2, SHORT_ZONE=25, HOLE_R=22, BALL_R=14;
+var S = {hole:0, scores:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null], shots:[], ballX:0, ballY:0, distToPin:0, dragging:false, strokeCount:0, moved:false, scoreAdj:0};
+var GX=0, GY=0, TX=0, TY=0, TH=0, CW=0, CH=0;
+var FAIRWAY_PTS = [];
+
+function $(id){return document.getElementById(id);}
+function isShort(d){return d < SHORT_ZONE;}
+function yardsFromTee(cy){return Math.round(HOLES[S.hole].yds * Math.max(0, Math.min(1, (TY - cy) / TH)));}
+
+function findClub(name){
+  for(var i=0;i<CLUBS.length;i++){if(CLUBS[i].name===name)return CLUBS[i];}
+  return null;
+}
+
+function suggestClub(d){
+  if(d <= 10) return {best: CLUBS[13], alts: []};
+  if(isShort(d)) return {best: findClub("SW"), alts: [findClub("LW"), findClub("GW")]};
+  var best = CLUBS[0], bd = 9999;
+  for(var i=0;i<CLUBS.length;i++){
+    var dd = Math.abs(CLUBS[i].avg - d);
+    if(dd < bd){bd = dd; best = CLUBS[i];}
+  }
+  var alts = [];
+  for(var j=0;j<CLUBS.length;j++){
+    if(CLUBS[j].name !== best.name && Math.abs(CLUBS[j].avg - d) < 40) alts.push(CLUBS[j]);
+  }
+  return {best: best, alts: alts.slice(0, 3)};
+}
+
+function pointInFairway(x, y){
+  if(!FAIRWAY_PTS.length) return false;
+  var inside = false;
+  for(var i=0, j=FAIRWAY_PTS.length-1; i<FAIRWAY_PTS.length; j=i++){
+    var xi = FAIRWAY_PTS[i].x, yi = FAIRWAY_PTS[i].y;
+    var xj = FAIRWAY_PTS[j].x, yj = FAIRWAY_PTS[j].y;
+    var intersect = ((yi > y) !== (yj > y)) && (x < (xj-xi)*(y-yi)/(yj-yi) + xi);
+    if(intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function nearBall(x, y){
+  var dx = x - S.ballX, dy = y - S.ballY;
+  return Math.sqrt(dx*dx + dy*dy) < BALL_R + 10;
+}
+
+function nearGreen(x, y){
+  var dx = x - GX, dy = y - GY;
+  return Math.sqrt(dx*dx + dy*dy) < HOLE_R + 15;
+}
+
+function show(id){
+  var screens = document.querySelectorAll(".screen");
+  for(var i=0;i<screens.length;i++) screens[i].classList.remove("active");
+  $(id).classList.add("active");
+}
+
+function selectCourse(key){
+  currentCourseKey = key;
+  HOLES = COURSES[key].holes;
+  $("crs-holmes").classList.toggle("sel", key==="holmes");
+  $("crs-crooked").classList.toggle("sel", key==="crooked");
+  var c = COURSES[key];
+  $("crs-name").textContent = c.name;
+  $("crs-info").textContent = c.info;
+  $("crs-par").textContent = c.par;
+  $("crs-yds").textContent = c.yds ? c.yds.toLocaleString() : "—";
+}
+
+function startRound(){
+  S.hole = 0;
+  S.scores = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+  S.shots = [];
+  S.dragging = false;
+  S.strokeCount = 0;
+  S.moved = false;
+  S.scoreAdj = 0;
+  var totalYds = 0;
+  for(var i=0;i<HOLES.length;i++) totalYds += HOLES[i].yds;
+  $("sc-total-yds").textContent = totalYds.toLocaleString();
+  buildDots();
+  show("s-hole");
+  goHole(0);
+}
+
+function buildDots(){
+  var g = $("hole-dots");
+  g.innerHTML = "";
+  for(var i=0;i<18;i++){
+    var d = document.createElement("div");
+    d.className = "dot";
+    d.textContent = i + 1;
+    d.id = "dot-" + i;
+    (function(idx){
+      d.addEventListener("click", function(e){e.preventDefault(); goHole(idx);});
+    })(i);
+    g.appendChild(d);
+  }
+}
+
+function goHole(i){
+  if(i < 0 || i > 17) return;
+  S.hole = i;
+  S.shots = [];
+  S.dragging = false;
+  S.strokeCount = 0;
+  S.moved = false;
+  S.scoreAdj = 0;
+  $("club-box-wrap").style.display = "none";
+  $("club-empty").style.display = "block";
+  $("h-strokes").textContent = "0";
+  $("shot-ct").textContent = "0";
+  $("adj-val").textContent = "0";
+  $("adj-val").style.color = "#1a5c2a";
+  updateZoneUI(HOLES[i].yds);
+  var h = HOLES[i];
+  $("h-num").textContent = "Hole " + (i + 1);
+  $("h-desc").textContent = h.desc;
+  $("h-par").textContent = h.par;
+  $("h-yds").textContent = h.yds;
+  renderShots();
+  renderScorecard();
+  updateDots();
+  setTimeout(initCanvas, 50);
+}
+
+function updateZoneUI(dist){
+  var close = isShort(dist);
+  $("zone-bar").className = "zone-bar" + (close ? " close" : "");
+  $("zone-bar").textContent = close
+    ? "Short game (<25y) — no stroke · drag to hole = +2 putts"
+    : "Touch ball or fairway to move · touch rough to scroll";
+}
+
+function initCanvas(){
+  var canvas = $("hole-canvas"), wrap = $("canvas-wrap");
+  var W = wrap.offsetWidth || 320;
+  var H = Math.round(W * 1.6);
+  canvas.width = W;
+  canvas.height = H;
+  CW = W;
+  CH = H;
+  var PAD = 30, GY0 = PAD + 12;
+  TY = H - PAD;
+  TH = TY - GY0;
+  var hd = HOLES[S.hole];
+  FAIRWAY_PTS = [];
+  for(var i=0;i<hd.fw.length;i++) FAIRWAY_PTS.push({x: hd.fw[i].x * W, y: GY0 + (hd.fw[i].y * TH)});
+  var gSum=0, gCount=0, tSum=0, tCount=0;
+  for(var j=0;j<FAIRWAY_PTS.length;j++){
+    if(FAIRWAY_PTS[j].y < GY0 + TH*0.25){gSum += FAIRWAY_PTS[j].x; gCount++;}
+    if(FAIRWAY_PTS[j].y > GY0 + TH*0.75){tSum += FAIRWAY_PTS[j].x; tCount++;}
+  }
+  GX = gCount ? gSum/gCount : W/2;
+  GY = GY0 + 10;
+  TX = tCount ? tSum/tCount : W/2;
+  S.ballX = TX;
+  S.ballY = TY - 10;
+  S.distToPin = hd.yds;
+  $("tap-hint").textContent = "Touch ball or fairway to move · touch rough to scroll";
+  drawScene();
+}
+
+function buildPath(ctx, pts){
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(var i=1;i<pts.length-1;i++){
+    var mx = (pts[i].x + pts[i+1].x)/2, my = (pts[i].y + pts[i+1].y)/2;
+    ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+  }
+  ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
+  ctx.closePath();
+}
+
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function drawScene(){
+  var canvas = $("hole-canvas");
+  if(!canvas || !CW) return;
+  var ctx = canvas.getContext("2d");
+  var W = CW, H = CH, hd = HOLES[S.hole];
+  var PAD = 30, GY0 = PAD + 12;
+
+  ctx.fillStyle = "#c8dda8";
+  ctx.fillRect(0, 0, W, H);
+
+  var pts = FAIRWAY_PTS;
+
+  buildPath(ctx, pts);
+  ctx.fillStyle = "#6aaa38";
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  var zY = GY0 + ((SHORT_ZONE / hd.yds) * TH);
+  buildPath(ctx, pts);
+  ctx.save();
+  ctx.clip();
+  ctx.fillStyle = "rgba(245,224,100,0.55)";
+  ctx.fillRect(0, GY0, W, zY - GY0);
+  ctx.restore();
+
+  ctx.strokeStyle = "rgba(160,110,0,0.8)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(0, zY);
+  ctx.lineTo(W, zY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = "rgba(120,75,0,0.9)";
+  ctx.font = "bold 9px sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillText("25y — short game", W - 46, zY - 4);
+
+  var minX = pts[0].x, maxX = pts[0].x;
+  for(var m=1;m<pts.length;m++){
+    if(pts[m].x < minX) minX = pts[m].x;
+    if(pts[m].x > maxX) maxX = pts[m].x;
+  }
+
+  if(hd.treeL){
+    for(var yL=GY0+18;yL<TY-18;yL+=24){
+      var jitL = ((yL*5)%14) - 7, txL = minX - 13 + jitL;
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 1.5;
+      ctx.fillStyle = "#2d6e1a";
+      ctx.beginPath();
+      ctx.arc(txL, yL, 11, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#1e5210";
+      ctx.beginPath();
+      ctx.arc(txL+4, yL+6, 8, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+  if(hd.treeR){
+    for(var yR=GY0+18;yR<TY-18;yR+=24){
+      var jitR = ((yR*7)%14) - 7, txR = maxX + 13 + jitR;
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 1.5;
+      ctx.fillStyle = "#2d6e1a";
+      ctx.beginPath();
+      ctx.arc(txR, yR, 11, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#1e5210";
+      ctx.beginPath();
+      ctx.arc(txR-4, yR+6, 8, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  if(hd.water){
+    var w = hd.water, wx = w.x*W, wy = GY0 + (w.y*TH), rx = w.rx*W, ry = w.ry*TH;
+    if(w.creek){
+      // Creek: draw as meandering stroke, support both horizontal and vertical creeks
+      ctx.beginPath();
+      if(ry > rx){
+        // Vertical creek (running up/down side)
+        ctx.moveTo(wx, wy - ry);
+        ctx.bezierCurveTo(wx - rx*4, wy - ry*0.3, wx + rx*4, wy + ry*0.3, wx, wy + ry);
+      } else {
+        // Horizontal creek (crossing fairway)
+        ctx.moveTo(wx - rx, wy);
+        ctx.bezierCurveTo(wx - rx*0.4, wy - ry*12, wx + rx*0.4, wy + ry*12, wx + rx, wy);
+      }
+      ctx.strokeStyle = "#4a8cbf";
+      ctx.lineWidth = 7;
+      ctx.stroke();
+      ctx.strokeStyle = "#7ab8e0";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.ellipse(wx, wy, rx, ry, 0, 0, Math.PI*2);
+      ctx.fillStyle = "#4a8cbf";
+      ctx.fill();
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  for(var b=0;b<hd.bunkers.length;b++){
+    var bn = hd.bunkers[b], bx = bn.x*W, by = GY0 + (bn.y*TH);
+    ctx.beginPath();
+    ctx.ellipse(bx, by, 14, 9, bn.rot, 0, Math.PI*2);
+    ctx.fillStyle = "#e8d070";
+    ctx.fill();
+    ctx.strokeStyle = "#1a1a1a";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.ellipse(GX, GY, 22, 14, 0, 0, Math.PI*2);
+  ctx.fillStyle = "#90d050";
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(GX, GY, 6, 0, Math.PI*2);
+  ctx.fillStyle = "#222";
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(GX+2, GY-2);
+  ctx.lineTo(GX+2, GY-22);
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(GX+2, GY-22);
+  ctx.lineTo(GX+15, GY-16);
+  ctx.lineTo(GX+2, GY-11);
+  ctx.fillStyle = "#cc2222";
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = "#8a7030";
+  roundRectPath(ctx, TX-16, TY-7, 32, 14, 3);
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 9px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("TEE", TX, TY+3);
+
+  var markers = [[0.25, Math.round(hd.yds*0.75)], [0.5, Math.round(hd.yds*0.5)], [0.75, Math.round(hd.yds*0.25)]];
+  for(var mk=0;mk<markers.length;mk++){
+    var pct = markers[mk][0], lbl = markers[mk][1], my = GY0 + (pct*TH);
+    if(Math.abs(my - zY) > 14){
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, my);
+      ctx.lineTo(W, my);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 1.5;
+      roundRectPath(ctx, W-44, my-9, 42, 16, 3);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#1a1a1a";
+      ctx.font = "bold 10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(lbl + "y", W-23, my+4);
+    }
+  }
+
+  var pinClose = isShort(S.distToPin);
+  ctx.font = "bold 11px sans-serif";
+  var pT = S.distToPin + "y to pin", pW = ctx.measureText(pT).width + 20;
+  ctx.fillStyle = pinClose ? "rgba(196,112,0,0.92)" : "rgba(26,92,42,0.92)";
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 1.5;
+  roundRectPath(ctx, 8, H-38, pW, 24, 4);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "left";
+  ctx.fillText(pT, 18, H-22);
+
+  if(S.moved){
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(S.ballX, S.ballY);
+    ctx.lineTo(GX, GY);
+    ctx.strokeStyle = "rgba(0,0,0,0.2)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.beginPath();
+  ctx.arc(S.ballX, S.ballY, BALL_R, 0, Math.PI*2);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(S.ballX, S.ballY, BALL_R + 4, 0, Math.PI*2);
+  ctx.strokeStyle = "rgba(26,92,42,0.4)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if(S.dragging){
+    var near = Math.sqrt(Math.pow(S.ballX-GX,2) + Math.pow(S.ballY-GY,2)) < HOLE_R*1.8;
+    var inZ = isShort(S.distToPin);
+    var fT = yardsFromTee(S.ballY);
+    var lbl, bg;
+    if(near){
+      var fs = S.strokeCount + 1 + PUTT_ADD + S.scoreAdj, par = HOLES[S.hole].par, diff = fs - par;
+      var dl = diff===0 ? "par" : diff===-1 ? "birdie" : diff===-2 ? "eagle" : diff===1 ? "bogey" : diff>1 ? "+"+diff : ""+diff;
+      lbl = "On green! " + fs + " (" + dl + ")";
+      bg = diff<0 ? "#1a5c2a" : diff===0 ? "#2a7a3a" : "#cc4400";
+    } else if(inZ){
+      lbl = fT + "y · no stroke";
+      bg = "#b07800";
+    } else {
+      lbl = fT + "y from tee";
+      bg = "#1a5c2a";
+    }
+    ctx.font = "bold 10px sans-serif";
+    var tw = Math.max(90, ctx.measureText(lbl).width + 24);
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = "#1a1a1a";
+    ctx.lineWidth = 2;
+    roundRectPath(ctx, S.ballX-tw/2, S.ballY-42, tw, 20, 4);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText(lbl, S.ballX, S.ballY-29);
+  }
+}
+
+function getXY(e){
+  var canvas = $("hole-canvas");
+  var r = canvas.getBoundingClientRect();
+  var sx = CW/r.width, sy = CH/r.height;
+  var src = e.touches && e.touches[0] ? e.touches[0] : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : e);
+  return {x: (src.clientX-r.left)*sx, y: (src.clientY-r.top)*sy};
+}
+
+function updateFromPos(x, y){
+  S.ballX = x;
+  S.ballY = y;
+  S.moved = true;
+  var pct = Math.max(0, Math.min(1, (TY-y)/TH));
+  var dist = Math.max(0, Math.round(HOLES[S.hole].yds * (1-pct)));
+  S.distToPin = dist;
+  updateZoneUI(dist);
+  var sc = suggestClub(dist);
+  $("suggest-club").textContent = sc.best.name;
+  $("suggest-range").textContent = isShort(dist) ? "short game — no stroke" : "carries ~" + sc.best.avg + " yds";
+  var altHtml = "";
+  for(var a=0;a<(sc.alts||[]).length;a++){
+    if(sc.alts[a]) altHtml += '<span class="alt-pill">' + sc.alts[a].name + '</span>';
+  }
+  $("suggest-alts").innerHTML = altHtml;
+  $("club-box-wrap").style.display = "block";
+  $("club-empty").style.display = "none";
+}
+
+function handleStart(e){
+  var p = getXY(e);
+  var shouldGrab = nearBall(p.x, p.y) || pointInFairway(p.x, p.y) || nearGreen(p.x, p.y);
+  if(!shouldGrab) return;
+  e.preventDefault();
+  S.dragging = true;
+  updateFromPos(p.x, p.y);
+  drawScene();
+}
+
+function handleMove(e){
+  if(!S.dragging) return;
+  e.preventDefault();
+  var p = getXY(e);
+  updateFromPos(p.x, p.y);
+  drawScene();
+  var n = Math.sqrt(Math.pow(p.x-GX,2) + Math.pow(p.y-GY,2)) < HOLE_R*1.8;
+  $("tap-hint").textContent = n ? "Release to finish ⛳" : isShort(S.distToPin) ? "Short game — no stroke" : yardsFromTee(p.y) + "y from tee";
+}
+
+function handleEnd(e){
+  if(!S.dragging) return;
+  e.preventDefault();
+  S.dragging = false;
+  var p = getXY(e);
+  updateFromPos(p.x, p.y);
+  var n = Math.sqrt(Math.pow(p.x-GX,2) + Math.pow(p.y-GY,2)) < HOLE_R*1.8;
+  if(n){holeOut(); return;}
+  if(!isShort(S.distToPin)){
+    S.strokeCount++;
+    var fT = yardsFromTee(p.y), club = $("suggest-club").textContent;
+    S.shots.push({stroke: S.strokeCount, club: club, dist: S.distToPin, loc: fT + "y from tee"});
+    $("h-strokes").textContent = S.strokeCount;
+    $("shot-ct").textContent = S.strokeCount;
+    renderShots();
+    $("tap-hint").textContent = "Shot " + S.strokeCount + " — " + fT + "y";
+  } else {
+    $("tap-hint").textContent = "Short game — no stroke";
+  }
+  drawScene();
+}
+
+function holeOut(){
+  S.strokeCount++;
+  var fs = S.strokeCount + PUTT_ADD + S.scoreAdj, par = HOLES[S.hole].par, diff = fs - par;
+  var dl = diff===0 ? "par" : diff===-1 ? "birdie" : diff===-2 ? "eagle" : diff===1 ? "bogey" : diff>1 ? "+"+diff : ""+diff;
+  var adj = S.scoreAdj!==0 ? " (adj " + (S.scoreAdj>0 ? "+" : "") + S.scoreAdj + ")" : "";
+  S.shots.push({stroke: fs, club: "On green", dist: 0, loc: S.strokeCount + " shots + 2 putts" + adj + " = " + fs});
+  S.scores[S.hole] = fs;
+  $("h-strokes").textContent = fs;
+  $("shot-ct").textContent = fs;
+  S.ballX = GX;
+  S.ballY = GY;
+  S.moved = false;
+  renderShots();
+  renderScorecard();
+  updateDots();
+  drawScene();
+  $("tap-hint").textContent = S.strokeCount + " shots + 2 putts" + adj + " = " + fs + " (" + dl + ")";
+  setTimeout(function(){if(S.hole<17) goHole(S.hole+1); else showSummary();}, 1600);
+}
+
+function undoShot(){
+  if(!S.shots.length) return;
+  var last = S.shots[S.shots.length-1];
+  if(last.dist === 0) S.scores[S.hole] = null;
+  S.shots.pop();
+  S.strokeCount = Math.max(0, S.strokeCount-1);
+  $("h-strokes").textContent = S.strokeCount;
+  $("shot-ct").textContent = S.strokeCount;
+  renderShots();
+  renderScorecard();
+}
+
+function manualFinish(){
+  if(!S.strokeCount){alert("Log at least one shot first."); return;}
+  var fs = S.strokeCount + PUTT_ADD + S.scoreAdj;
+  S.scores[S.hole] = fs;
+  renderScorecard();
+  updateDots();
+  if(S.hole<17) goHole(S.hole+1); else showSummary();
+}
+
+function renderShots(){
+  var el = $("shots-list");
+  if(!S.shots.length){
+    el.innerHTML = "<div style='font-size:12px;color:#666;padding:5px 0;font-weight:600'>No shots yet</div>";
+    return;
+  }
+  var html = "";
+  for(var i=0;i<S.shots.length;i++){
+    var s = S.shots[i];
+    html += '<div class="shot-row"><span>#' + s.stroke + ' · ' + s.club + ' · ' + s.loc + '</span><span style="color:#1a5c2a;font-weight:700">' + (s.dist>0 ? s.dist+"y" : "") + '</span></div>';
+  }
+  el.innerHTML = html;
+}
+
+function updateDots(){
+  for(var i=0;i<18;i++){
+    var d = $("dot-" + i);
+    if(!d) continue;
+    d.classList.remove("active", "done");
+    if(i === S.hole) d.classList.add("active");
+    else if(S.scores[i] !== null) d.classList.add("done");
+  }
+}
+
+function renderScorecard(){
+  var tbody = $("sc-body");
+  var html = "", total = 0, parTotal = 0, played = 0;
+  for(var i=0;i<18;i++){
+    var sc = S.scores[i], par = HOLES[i].par;
+    var cls = "", rel = "—";
+    if(sc !== null){
+      var d = sc - par;
+      rel = d===0 ? "E" : d>0 ? "+"+d : ""+d;
+      if(d<=-2) cls = "eagle";
+      else if(d===-1) cls = "birdie";
+      else if(d===0) cls = "par-c";
+      else if(d===1) cls = "bogey";
+      else cls = "dbl";
+      total += sc;
+      parTotal += par;
+      played++;
+    }
+    html += '<tr class="' + (i===S.hole ? "cur" : "") + '"><td>' + (i+1) + '</td><td>' + par + '</td><td>' + HOLES[i].hcp + '</td><td>' + HOLES[i].yds + '</td><td class="' + cls + '">' + (sc!==null?sc:"—") + '</td><td class="' + cls + '">' + (sc!==null?rel:"—") + '</td></tr>';
+  }
+  tbody.innerHTML = html;
+  $("sc-total-score").textContent = played ? total : "—";
+  var relEl = $("sc-total-rel");
+  if(!played){relEl.textContent = "—"; relEl.className = "rel even";}
+  else {
+    var d2 = total - parTotal;
+    relEl.textContent = d2===0 ? "E" : d2>0 ? "+"+d2 : ""+d2;
+    relEl.className = "rel " + (d2<0 ? "under" : d2>0 ? "over" : "even");
+  }
+}
+
+function switchTab(tab){
+  var tabs = document.querySelectorAll(".tab");
+  var panels = document.querySelectorAll(".tab-panel");
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove("active");
+  for(var j=0;j<panels.length;j++) panels[j].classList.remove("active");
+  $("tab-" + tab).classList.add("active");
+  $("panel-" + tab).classList.add("active");
+  if(tab === "hole") setTimeout(drawScene, 40);
+}
+
+function adjustScore(delta){
+  S.scoreAdj += delta;
+  $("adj-val").textContent = S.scoreAdj>0 ? "+"+S.scoreAdj : S.scoreAdj;
+  $("adj-val").style.color = S.scoreAdj>0 ? "#aa1111" : "#1a5c2a";
+}
+
+function showSummary(){
+  var par = 0;
+  for(var i=0;i<HOLES.length;i++) par += HOLES[i].par;
+  var total = 0;
+  for(var j=0;j<S.scores.length;j++){if(S.scores[j]) total += S.scores[j];}
+  var d = total - par;
+  alert("Round complete!\n" + COURSES[currentCourseKey].name + "\nStrokes: " + total + "\nVs par: " + (d===0 ? "E" : d>0 ? "+"+d : d));
+}
+
+function goStart(){show("s-start");}
+
+function wireButton(id, handler){
+  var el = $(id);
+  if(!el) return;
+  var fired = false;
+  function fire(e){
+    if(fired) return;
+    fired = true;
+    setTimeout(function(){fired = false;}, 300);
+    e.preventDefault();
+    e.stopPropagation();
+    try{handler();}catch(err){alert("Error: " + err.message);}
+    return false;
+  }
+  el.addEventListener("click", fire, false);
+  el.addEventListener("touchend", fire, false);
+}
+
+function init(){
+  wireButton("btn-start", startRound);
+  wireButton("btn-prev", function(){goHole(S.hole-1);});
+  wireButton("btn-next", function(){goHole(S.hole+1);});
+  wireButton("btn-minus", function(){adjustScore(-1);});
+  wireButton("btn-plus", function(){adjustScore(1);});
+  wireButton("btn-undo", undoShot);
+  wireButton("btn-finish", manualFinish);
+  wireButton("btn-back", goStart);
+  wireButton("crs-holmes", function(){selectCourse("holmes");});
+  wireButton("crs-crooked", function(){selectCourse("crooked");});
+
+  $("tab-hole").addEventListener("click", function(e){e.preventDefault(); switchTab("hole");}, false);
+  $("tab-score").addEventListener("click", function(e){e.preventDefault(); switchTab("score");}, false);
+
+  var c = $("hole-canvas");
+  if(c){
+    c.addEventListener("mousedown", handleStart, false);
+    c.addEventListener("touchstart", handleStart, {passive:false});
+    c.addEventListener("mousemove", handleMove, false);
+    c.addEventListener("touchmove", handleMove, {passive:false});
+    c.addEventListener("mouseup", handleEnd, false);
+    c.addEventListener("touchend", handleEnd, {passive:false});
+    c.addEventListener("touchcancel", handleEnd, {passive:false});
+    c.addEventListener("mouseleave", function(){if(S.dragging){S.dragging=false; drawScene();}}, false);
+  }
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
